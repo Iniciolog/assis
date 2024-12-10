@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Assistant</title>
+<style>
+body { font-family: Arial, sans-serif; }
+#chat-container { width: 300px; margin: 50px auto; border: 1px solid #ccc; padding: 10px; }
+#messages { height: 200px; overflow-y: scroll; border-bottom: 1px solid #ccc; margin-bottom: 10px; }
+#input-container { display: flex; }
+#message-input { flex: 1; }
+#send-button { margin-left: 10px; }
+</style>
+</head>
+<body>
+<div id="chat-container">
+<div id="messages"></div>
+<div id="input-container">
+<input type="text" id="message-input" placeholder="Введите сообщение...">
+<button id="send-button">Отправить</button>
+</div>
+</div>
+
+<script>
+document.getElementById('send-button').addEventListener('click', function() {
+const message = document.getElementById('message-input').value;
+if (!message) return;
+
+// Добавить сообщение пользователя в чат
+const messagesDiv = document.getElementById('messages');
+const userMessageDiv = document.createElement('div');
+userMessageDiv.textContent = "Вы: " + message;
+messagesDiv.appendChild(userMessageDiv);
+document.getElementById('message-input').value = '';
+
+// Отправить запрос на сервер
+fetch('assistant.php', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({ message: message })
+})
+.then(response => response.json())
+.then(data => {
+// Добавить ответ ассистента в чат
+const assistantMessageDiv = document.createElement('div');
+assistantMessageDiv.textContent = "Ассистент: " + data.response;
+messagesDiv.appendChild(assistantMessageDiv);
+})
+.catch(error => console.error('Error:', error));
+
+// Прокрутить вниз, чтобы всегда видеть последнее сообщение
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+</script>
+</body>
+</html>
